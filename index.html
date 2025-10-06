@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Calendar, Clock, TrendingUp } from 'lucide-react';
 
-const InternshipTracker = () => {
+export default function InternshipTracker() {
   const [entries, setEntries] = useState([
     { date: '2025-09-15', startTime: '12:30', endTime: '17:00' },
     { date: '2025-09-17', startTime: '13:00', endTime: '17:00' },
@@ -32,10 +32,14 @@ const InternshipTracker = () => {
   }, 0);
 
   const remainingHours = TOTAL_REQUIRED_HOURS - totalHoursWorked;
-  const remainingDays = Math.floor(remainingHours / 24);
-  const remainingHoursAfterDays = remainingHours % 24;
-  const remainingWeeks = Math.floor(remainingDays / 7);
-  const remainingDaysAfterWeeks = remainingDays % 7;
+  
+  // Calculate calendar days until end date
+  const today = new Date();
+  const endDate = new Date(END_DATE);
+  const timeDiff = endDate - today;
+  const calendarDaysRemaining = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
+  const calendarWeeksRemaining = Math.floor(calendarDaysRemaining / 7);
+  const calendarDaysAfterWeeks = calendarDaysRemaining % 7;
 
   const addEntry = () => {
     if (newDate && newStartTime && newEndTime) {
@@ -148,12 +152,12 @@ const InternshipTracker = () => {
         <div className="bg-white rounded-lg shadow p-6">
           <div className="flex items-center gap-2 mb-2">
             <Calendar className="text-blue-600" />
-            <h2 className="text-lg font-semibold text-gray-700">Time Remaining</h2>
+            <h2 className="text-lg font-semibold text-gray-700">Calendar Days Until End</h2>
           </div>
           <p className="text-2xl font-bold text-blue-600">
-            {remainingWeeks}w {remainingDaysAfterWeeks}d {remainingHoursAfterDays.toFixed(1)}h
+            {calendarWeeksRemaining}w {calendarDaysAfterWeeks}d
           </p>
-          <p className="text-sm text-gray-500">Weeks, Days, Hours</p>
+          <p className="text-sm text-gray-500">Until December 8, 2025</p>
         </div>
       </div>
 
@@ -233,16 +237,19 @@ const InternshipTracker = () => {
               </tr>
             </thead>
             <tbody>
-              {entries.map((entry, index) => (
-                <tr key={index} className="border-b hover:bg-gray-50">
-                  <td className="px-4 py-2">{new Date(entry.date).toLocaleDateString()}</td>
-                  <td className="px-4 py-2">{entry.startTime}</td>
-                  <td className="px-4 py-2">{entry.endTime}</td>
-                  <td className="px-4 py-2 font-semibold text-blue-600">
-                    {calculateHours(entry.startTime, entry.endTime).toFixed(1)}h
-                  </td>
-                </tr>
-              ))}
+              {entries.map((entry, index) => {
+                const displayDate = new Date(entry.date + 'T12:00:00');
+                return (
+                  <tr key={index} className="border-b hover:bg-gray-50">
+                    <td className="px-4 py-2">{displayDate.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</td>
+                    <td className="px-4 py-2">{entry.startTime}</td>
+                    <td className="px-4 py-2">{entry.endTime}</td>
+                    <td className="px-4 py-2 font-semibold text-blue-600">
+                      {calculateHours(entry.startTime, entry.endTime).toFixed(1)}h
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>
@@ -250,5 +257,3 @@ const InternshipTracker = () => {
     </div>
   );
 };
-
-export default InternshipTracker;
