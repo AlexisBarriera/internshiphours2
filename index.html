@@ -13,7 +13,7 @@
     <div id="root"></div>
     
     <script type="text/babel">
-        const { useState } = React;
+        const { useState, useEffect } = React;
 
         function CalendarIcon() {
             return (
@@ -27,18 +27,25 @@
         }
 
         function InternshipTracker() {
-            const [entries, setEntries] = useState([
-                { date: '2025-09-15', startTime: '12:30', endTime: '17:00', hours: 4.5 },
-                { date: '2025-09-17', startTime: '13:00', endTime: '17:00', hours: 4 },
-                { date: '2025-09-22', startTime: '13:00', endTime: '17:00', hours: 4 },
-                { date: '2025-09-24', startTime: '13:00', endTime: '17:00', hours: 4 },
-                { date: '2025-09-29', startTime: '13:00', endTime: '17:00', hours: 4 },
-                { date: '2025-10-01', startTime: '12:30', endTime: '17:00', hours: 4.5 }
-            ]);
+            const [entries, setEntries] = useState(() => {
+                const savedEntries = localStorage.getItem('internshipEntries');
+                return savedEntries ? JSON.parse(savedEntries) : [
+                    { date: '2025-09-15', startTime: '12:30', endTime: '17:00', hours: 4.5 },
+                    { date: '2025-09-17', startTime: '13:00', endTime: '17:00', hours: 4 },
+                    { date: '2025-09-22', startTime: '13:00', endTime: '17:00', hours: 4 },
+                    { date: '2025-09-24', startTime: '13:00', endTime: '17:00', hours: 4 },
+                    { date: '2025-09-29', startTime: '13:00', endTime: '17:00', hours: 4 },
+                    { date: '2025-10-01', startTime: '12:30', endTime: '17:00', hours: 4.5 }
+                ];
+            });
 
             const [newDate, setNewDate] = useState('');
             const [newStartTime, setNewStartTime] = useState('');
             const [newEndTime, setNewEndTime] = useState('');
+
+            useEffect(() => {
+                localStorage.setItem('internshipEntries', JSON.stringify(entries));
+            }, [entries]);
 
             const TOTAL_REQUIRED_HOURS = 90;
             const START_DATE = new Date('2025-09-15');
@@ -295,3 +302,4 @@
     </script>
 </body>
 </html>
+
