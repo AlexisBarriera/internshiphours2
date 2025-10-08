@@ -80,10 +80,12 @@
 
             const totalHours = entries.reduce((sum, entry) => sum + entry.hours, 0);
             const remainingHours = TOTAL_REQUIRED_HOURS - totalHours;
-            const remainingDays = Math.floor(remainingHours / 4);
-            const remainingHoursAfterDays = remainingHours % 4;
-            const remainingWeeks = Math.floor(remainingDays / 5);
-            const remainingDaysAfterWeeks = remainingDays % 5;
+            const hoursPerWeek = 5 * 2; // 5 hours per day, 2 days per week
+            const remainingWeeks = Math.ceil(remainingHours / hoursPerWeek);
+            const hoursWorkedThisRegime = Math.floor(totalHours / hoursPerWeek) * hoursPerWeek;
+            const remainingHoursFromPartialWeek = (totalHours - hoursWorkedThisRegime) > 0
+                ? Math.ceil((remainingHours % hoursPerWeek) / 5) * 5
+                : Math.ceil(remainingHours / 5);
 
             const generateCalendar = () => {
                 const months = [];
@@ -145,8 +147,11 @@
                                         <p className="text-lg"><span className="font-semibold">Required Hours:</span> {TOTAL_REQUIRED_HOURS} hours</p>
                                         <p className="text-lg"><span className="font-semibold">Remaining:</span> {remainingHours.toFixed(2)} hours</p>
                                         <div className="mt-4 pt-4 border-t border-indigo-200">
+                                            <p className="text-lg text-indigo-600 mb-2">
+                                                Based on 2 days/week (Mon & Wed) at 5 hours/day:
+                                            </p>
                                             <p className="text-xl font-bold text-indigo-600">
-                                                {remainingWeeks} weeks, {remainingDaysAfterWeeks} days, {remainingHoursAfterDays.toFixed(1)} hours left
+                                                {remainingWeeks} more weeks needed
                                             </p>
                                         </div>
                                     </div>
@@ -302,4 +307,3 @@
     </script>
 </body>
 </html>
-
